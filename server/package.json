@@ -17,10 +17,6 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.7",
-    "react-redux": "^7.2.6",
-    "redux": "^4.1.2",
-    "redux-devtools": "^3.7.0",
-    "strip": "^3.0.0",
     "stripe": "^8.190.0"
   },
   "devDependencies": {
