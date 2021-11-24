@@ -1,11 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+import { onError } from 'apollo-link-error';
 import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
   createHttpLink,
+  ApolloLink,
 } from "@apollo/client";
 
 import Home from "./pages/Home";
@@ -25,20 +26,23 @@ const httpLink = createHttpLink({
 
 console.log(httpLink);
 
-const authenticationLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("id_token");
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : "",
-    },
-  };
-});
-const client = new ApolloClient({
-  link: authenticationLink.concat(httpLink),
-  cache: new InMemoryCache(),
+const errorLink = onError(({ graphQLErrors }) => {
+  if (graphQLErrors) graphQLErrors.map(({ message }) => console.log(message))
 });
 
+const client = new ApolloClient({
+  request: (operation) => {
+    const token = localStorage.getItem('id_token')
+    operation.setContext({
+      headers: {
+        authorization: token ? `Bearer ${token}` : ''
+      },
+      link: ApolloLink.from([errorLink, httpLink]),
+      cache: new InMemoryCache(),
+    })
+  },
+  
+})
 
 function App() {
   return (
